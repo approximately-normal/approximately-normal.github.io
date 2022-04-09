@@ -12,7 +12,7 @@
 
   label {
     display: block;
-    background-color: rgba(120,120,120,.15);
+    background-color: rgba(120,120,120,0.15);
     cursor: pointer;
   }
 
@@ -21,7 +21,7 @@
     width: 50%;
     height: 100%;
     background-color: #fff;
-    box-shadow: 0 2px 15px rgba(0,0,0,.15);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.15);
     transition: transform .2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
@@ -53,11 +53,11 @@
   /* Toggle */
   [type="checkbox"]:checked ~ label .toggle {
     transform: translateX(100%);
-    background-color: #34323D;
+    background-color: #34323D; /*was #34323D*/
   }
 
   [type="checkbox"]:checked ~ label .dark{
-    opacity: 1;
+    opacity: 1; /*was 1*/
   }
 
   [type="checkbox"]:checked ~ label .light{

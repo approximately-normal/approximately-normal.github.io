@@ -80,7 +80,8 @@ html[data-theme="dark"]  {
   .page-banner {
     .page-banner-img {
       & > *:first-child {
-        opacity: 0.8;
+        opacity: 1;//was 0.8
+        filter: invert(1);
       }
     }
   }
@@ -194,4 +195,3 @@ html[data-theme="dark"]  {
     }
   }
 }
-
