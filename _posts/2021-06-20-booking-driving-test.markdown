@@ -10,11 +10,7 @@ A couple of years ago I'd just finished a the last semester of my degree, in whi
 
 Booking a driving test in Perth was difficult at the best of times, but near impossible over the busy holiday period. Test centres would often book out for months in advance. Snagging a booking meant repeatedly checking the DOTWA website until a slot opened.
 
-There were better ways to use my time than checking a website several times an hour. Surely there was some way the process could be automated? I decided it was an opportunity to try something new with Python.
-
-The attached video gives a rundown of what I ended up putting together. The video shows the script in action, with a little detail about what it does (apparently I hadn't discovered screen recording at the time). You can access the script itself at ...
-
-INSERT VIDEO HERE
+There were better ways to use my time than checking a website several times an hour. Surely there was some way the process could be automated? I decided it was an opportunity to try something new with Python. [This repo](https://github.com/approximately-normal/PDAbooker) shows the result.
 
 The main idea is to use a webdriver called Selenium to access the site exactly the way a human would. There's no endpoints I can access, so the script essentially clicks and types its way through the pages.
 
