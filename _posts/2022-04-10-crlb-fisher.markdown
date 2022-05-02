@@ -5,7 +5,6 @@ date:   2021-06-20 00:15:08 +1000
 categories: jekyll update
 ---
 
-TEST PUSH
 
 Fisher Information is one of those topics that many will cover once in their studies on the way to more applied areas of statistics. The practical use of the CRLB is limited to cases where the sample at hand has a known distribution with an analytic form, which often doesn't apply.
 
