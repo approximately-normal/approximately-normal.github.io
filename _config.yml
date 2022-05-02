@@ -28,9 +28,10 @@ github_username:  jekyll
 
 # Build settings
 #theme: jekyll-theme-yat
-remote_theme: jeffreytse/jekyll-theme-yat 
+remote_theme: jeffreytse/jekyll-theme-yat
 plugins:
   - jekyll-feed
+  - jekyll-spaceship
 
 # Exclude from processing.
 # The following items will not be processed, by default.
