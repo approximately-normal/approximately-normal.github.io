@@ -22,7 +22,7 @@ title: Jefferson Allan
 email: your-email@example.com
 description: Programming, stats and other things data. Living life one error message at a time.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "approximately-normal.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username:  jekyll
 
