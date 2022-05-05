@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="https://approximately-normal.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://approximately-normal.github.io/" rel="alternate" type="text/html" /><updated>2022-05-05T22:26:21+00:00</updated><id>https://approximately-normal.github.io/feed.xml</id><title type="html">Jefferson Allan</title><subtitle>Programming, stats and other things data. Living life one error message at a time.</subtitle><entry><title type="html">Booking a Driving Test with Python</title><link href="https://approximately-normal.github.io/jekyll/update/2021/06/19/booking-driving-test.html" rel="alternate" type="text/html" title="Booking a Driving Test with Python" /><published>2021-06-19T14:15:08+00:00</published><updated>2021-06-19T14:15:08+00:00</updated><id>https://approximately-normal.github.io/jekyll/update/2021/06/19/booking-driving-test</id><content type="html" xml:base="https://approximately-normal.github.io/jekyll/update/2021/06/19/booking-driving-test.html">&lt;p&gt;It’s often not clear whether it’s faster to do it manually or write a script. Whether or not I save any time, I often find myself scripting a task if I have to do it more than a few times. Even a few ‘wasted’ hours usually result in some new skills.&lt;/p&gt;
+
+&lt;p&gt;A couple of years ago I’d just finished a the last semester of my degree, in which I’d decided to take an elective in programming. One of my main projects for that summer holiday was to upgrade my automatic driving license to a manual license.&lt;/p&gt;
+
+&lt;p&gt;Booking a driving test in Perth was difficult at the best of times, but near impossible over the busy holiday period. Test centres would often book out for months in advance. Snagging a booking meant repeatedly checking the DOTWA website until a slot opened.&lt;/p&gt;
+
+&lt;p&gt;There were better ways to use my time than checking a website several times an hour. Surely there was some way the process could be automated? I decided it was an opportunity to try something new with Python. &lt;a href=&quot;https://github.com/approximately-normal/PDAbooker&quot;&gt;This repo&lt;/a&gt; shows the result.&lt;/p&gt;
+
+&lt;p&gt;The main idea is to use a webdriver called Selenium to access the site exactly the way a human would. There’s no endpoints I can access, so the script essentially clicks and types its way through the pages.&lt;/p&gt;
+
+&lt;p&gt;The first thing I’ll do is set up Selenium. First I’ll import the webdriver module and create an instance of the webdriver.Chrome() class:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;selenium&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webdriver&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webdriver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Chrome&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'C:\Users\allan\AppData\Local\Programs\chromedriver\chromedriver.exe'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The webdriver.Chrome() class contains methods for interacting with the webpage. The instance is initialised to a path containing the ChromeDriver executable, which I’ve already downloaded. Now I can use ‘get()’ to navigate to the PDA booking webpage:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://online.transport.wa.gov.au/pdabooking/manage/?0'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I’d like to run the script again while I write this up. Unfortunately, unless you’ve paid for a test, you can only access the first page:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PDA_booker/landing_page.png&quot; alt=&quot;Landing page&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;Interacting with this page means identifying individual HTML elements. Take entering a licence number as an example. To enter a number in the “Driver’s License/Permit Number”, I need to access the right HTML element. I can find it using inspect element:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PDA_booker/drivers_license.png&quot; alt=&quot;Driver's License HTML&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;One of the ways Selenium can select an element is using its Xpath. An XPath is like a file path for all the elements in an XML document. However, because XML and HTML are very similar, they can also be used to navigate HTML documents like a webpage. Inspect element provides an easy way to find an XPath:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PDA_booker/xpath.png&quot; alt=&quot;Driver's License HTML&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;The XPath for the element is “//*[@id=’id8’]/ol/li[5]/div/input”. The webdriver can be used to create an ‘element’ instance,
+which has its own methods for interacting with the webpage. In this case I’ll create an instance called “lic_num” and then use its send_keys() method to send it a license number:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;lic_num&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send_keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'1234567'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Selenium provides a few ways to interact with a webpage. For example, you could use click() to click ‘continue’:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;cont_button&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_element_by_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'id5'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;cont_button&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;click&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;For this project, I didn’t need to use Selenium for anything more complicated than entering text, clicking buttons, and selecting dropdown items. Most of the script is logic used to book the right test. Settings at the top of the script specify a date and time range:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;test_centre_text&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'West Perth'&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;earliest_time&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;08:00&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;latest_time&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;17:00&quot;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;earliest_dfn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;latest_dfn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;In this case I’m trying to book any test from 8am to 5pm, between 9 and 15 days from now (‘dfn’). Over the peak summer period, this was very soon to book a test! Once Selenium has navigated to the right page, a function called ‘get_test_time_date()’
+is used to strip out date and time information from the text options on the page:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_test_time_date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;input_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;GETTING TEST TIME DATE&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dates&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dates_dt&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;global&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;times_dt&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dates&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dates_dt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;times_dt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;date_pat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'\d+/\d+/\d+'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;time_pat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;sa&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'\d+:\d+\s+\w+'&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;input_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;date_gr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;re&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;search&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date_pat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;time_gr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;re&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;search&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time_pat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;#print(date_gr)
+&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;#print(time_gr)
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date_gr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;group&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;time12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time_gr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;group&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;time12&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'0'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time12&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;time24&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;convert24&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;dt_string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;' '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time24&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dt_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;date_dt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strptime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'%d/%m/%Y'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;time_dt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strptime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time24&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'%H:%M'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;#print(time12)
+&lt;/span&gt;        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time24&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;date_dt: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;time_dt: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;dates&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;times&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time24&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;dates_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;times_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;time_dt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;        
+
+        &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The get_test_time_date() function creates several lists, each containing dates or times representing the booking slots on the webpage. I’ve used global variables here, which I realise now is a progamming sin. Really these variables would be better off as attributes of a class. Creating a class would also give me somewhere to bundle up all my functions.&lt;/p&gt;
+
+&lt;p&gt;From here the, the get_suitability() function performs some comparisons and returns a boolean list, describing whether each booking option meets the date and time criteria. The first suitable test slot is then booked, or else the script closes the webdriver and exits. A simple batch script is used to repeatedly call my python script:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-batch&quot; data-lang=&quot;batch&quot;&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;off&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;title&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;My&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;Test&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;Batch&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;File&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;:: See the title at the top. And this comment will not appear in the command prompt.&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'False'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;C&lt;/span&gt;:\Users\allan\Documents\pythonStuff\PDAbooker\booked_bool.txt
+
+&lt;span class=&quot;nl&quot;&gt;:while&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;my_booking_script&quot;&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;python&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;.exe&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;C&lt;/span&gt;:\Users\allan\Documents\pythonStuff\PDAbooker\PDAbooker2.py
+&lt;span class=&quot;nb&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;/t &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;60&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;taskkill&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;/f /FI &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WINDOWTITLE eq my_booking_script&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;/t &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;240&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;goto&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;:while&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;The script runs about every 5 minutes by default, which I thought would give me a good chance of snagging a short-lived test slot. While reducing this period might have improved my chances, I didn’t want to create unnecessary traffic on the DOTWA website (or potentially get my IP banned). Once a booking has been made, a text file called ‘booked_bool.txt’ is edited, which then prevents the webdriver from running. All test slots are recorded in a .csv file, which allows me to see how long it took to book a test. In my case it ran for about 3 full days before finding a suitable booking! It certainly seems this project saved me some time - and thanks to a little Python I now have a manual license.&lt;/p&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">It’s often not clear whether it’s faster to do it manually or write a script. Whether or not I save any time, I often find myself scripting a task if I have to do it more than a few times. Even a few ‘wasted’ hours usually result in some new skills.</summary></entry><entry><title type="html">Fisher Information Part 1 - Some Intuition</title><link href="https://approximately-normal.github.io/jekyll/update/2021/06/19/crlb-fisher.html" rel="alternate" type="text/html" title="Fisher Information Part 1 - Some Intuition" /><published>2021-06-19T14:15:08+00:00</published><updated>2021-06-19T14:15:08+00:00</updated><id>https://approximately-normal.github.io/jekyll/update/2021/06/19/crlb-fisher</id><content type="html" xml:base="https://approximately-normal.github.io/jekyll/update/2021/06/19/crlb-fisher.html">&lt;p&gt;Fisher Information is one of those topics that many will cover once in their studies on the way to more applied areas of statistics. The practical use of the CRLB is limited to cases where the sample at hand has a known distribution with an analytic form, which often doesn’t apply.&lt;/p&gt;
+
+&lt;p&gt;These posts will take a brief look at the Fisher Information and the CRLB from a less formal point of view to gain some intuitive sense of what they are doing.&lt;/p&gt;
+
+&lt;h2 id=&quot;score&quot;&gt;Score&lt;/h2&gt;
+
+&lt;p&gt;The score can be calculated as:&lt;/p&gt;
+
+&lt;p&gt;$$ V\left( X,\theta \right) =\dfrac{\partial }{\partial \theta }\ln L\left( X,\theta \right) $$&lt;/p&gt;
+
+&lt;p&gt;A good way of thinking about score is as sensitivity of the log-likelihood to $\theta$ at a specific value of $\theta$. In other words, a large score (positive or negative) indicates that log likelihood is highly sensitive to the parameter in question.&lt;/p&gt;
+
+&lt;p&gt;Since score is calculated using log likelihood, it doesn’t depend on the absolute scale of the likelihood. Rearranging the score expression makes this clear:&lt;/p&gt;
+
+&lt;p&gt;$$ \dfrac{\partial }{\partial \theta }\ln L\left( X,\theta \right) =\dfrac{\dfrac{\partial }{\partial \theta }L\left( X,\theta \right) }{L\left( X,\theta \right) } $$&lt;/p&gt;
+
+&lt;p&gt;This is a useful property as maximum likelihood can vary over orders of magnitude. The log also tends to make the maths easier since many common functions involve powers of e, and it turns pesky multiplications into additions.&lt;/p&gt;
+
+&lt;h2 id=&quot;calculating-score&quot;&gt;Calculating Score&lt;/h2&gt;
+
+&lt;p&gt;I tend to find that I have a better grasp of the maths if I have some feeling for the numbers at hand. As an example, I’ve generated samples of 10 observation from different normal distributions. As a comparison, I’ve used two normal distributions centred on 0 with standard deviations of 1 and 2 respectively:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;set.seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3.14&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#ensure that results are reproducible&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;small_var&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#generate 10 IID observations from the standard normal distribution&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;large_var&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sd&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#double the standard deviation&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;In this example, the inferred parameter $\theta$ is the mean $\mu$. Log likelihood is calculated here using different values of $\mu$. The peak log likelihood occurs at the maximum likelihood estimator (MLE) of $\mu$. Note that log likelihood curve is sharper when $\sigma$ is smaller.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CRLB/graph1.png&quot; alt=&quot;Log likelihood vs µ&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;The score is the gradient of this curve. Though it can be calculated analytically in this case, I’ve approximated the  derivative numerically using a simple central difference:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;st_dev&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lhood_minus&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log_likelihood&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;-0.01&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;st_dev&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lhood_plus&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;log_likelihood&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mu&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;+0.01&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;st_dev&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lhood_plus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lhood_minus&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0.02&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Which looks like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CRLB/graph2.png&quot; alt=&quot;Score vs µ&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;In the case of the normal distribution, the score forms a nice straight line. Notice that this line is steeper for $\sigma = 1$. However, we’re really only interested in what happens at the true value of $\theta$. In other words, the value of the score at $\mu = 0$.&lt;/p&gt;
+
+&lt;h2 id=&quot;fisher-information&quot;&gt;Fisher Information&lt;/h2&gt;
+
+&lt;p&gt;Imagine generating many of these random samples and calculating the value of this intercept (at the true value of $\theta$) each time. The asymptotic variance of all the observations is the Fisher Information. More formally:&lt;/p&gt;
+
+&lt;p&gt;$$ I_{X}\left( \theta \right) =Var_{\theta}\left( s\left( X,\theta \right) \right) $$&lt;/p&gt;
+
+&lt;p&gt;Since the expected value of the score is zero:&lt;/p&gt;
+
+\[\begin{align*}
+Var_{\theta }\left( s\left( X,\theta \right) \right) &amp;amp;= E_{\theta}\left( s-E_{\theta}\left( s\right) \right) ^{2}\\ &amp;amp;= E_{\theta}\left( s^{2}\right)
+\end{align*}\]
+
+&lt;p&gt;Note that the Fisher information above is for the entire sample X. However, it can also be calculated for an individual observation such as $X_{1}$. A very useful property of Fisher information is that these values are closely related. For independent, identically distributed (IID) samples:&lt;/p&gt;
+
+&lt;p&gt;$$ I_{X}(\theta) = nI_{X_{i}}(\theta) $$&lt;/p&gt;
+
+&lt;p&gt;where $n$ is the sample size.&lt;/p&gt;
+
+&lt;h2 id=&quot;calculating-fisher-information&quot;&gt;Calculating Fisher Information&lt;/h2&gt;
+
+&lt;p&gt;The normal distribution has two parameters and so its Fisher information actually takes the form of a diagonal 2*2 matrix. I’ll derive the Fisher information with respect to $\mu$. The easiest way to approach this calculation is to calculate it for a single observation, using the sample size property given above:&lt;/p&gt;
+
+\[\begin{align}
+L\left( x,\theta \right) &amp;amp;=\dfrac{1}{\sigma \sqrt{2\pi }}e^{-\dfrac{1}{2}\left( \dfrac{x-\mu }{\sigma }\right) ^{2}} \\ \\
+
+ \ln L\left( x,\theta \right) &amp;amp;=-\ln \left( \sigma \sqrt{2\pi }\right) -\dfrac{1}{2\sigma ^{2}}\left( x-\theta \right) ^{2} \\ \\
+
+ s\left( x,\theta \right) &amp;amp;=\dfrac{\partial }{\partial \theta }\left( -\log \left( \sigma \sqrt{2\pi }\right) -\dfrac{1}{2\sigma ^{2}}\left( x-\theta \right) ^{2}\right) \\ &amp;amp;=\dfrac{\partial }{\partial \theta }\left( -\dfrac{1}{2\sigma ^{2}}\left( x^{2}-2\theta x+\theta ^{2}\right) \right) \\ &amp;amp;=\dfrac{1}{2\sigma ^{2}}\left( -2\theta +2x\right) \\[3px] &amp;amp;= \dfrac{\theta -x}{\sigma ^{2}} \\ \\
+
+ I_{X_{i}}\left( \theta \right) &amp;amp;=E_{\theta }\left[ \left( s\left( x,\theta \right) \right) ^{2}\right] \\ &amp;amp;=E_{\theta }\left[ \dfrac{\left( \theta -x\right) ^{2}}{\sigma ^{4}}\right] \\ &amp;amp;=E_{\theta }\left[ \dfrac{\sigma ^{2}}{\sigma ^{4}}\right] \\ &amp;amp;=\dfrac{1}{\sigma ^{2}}\end{align}\]
+
+&lt;p&gt;There’s actually an easier way to calculate the Fisher information here using the second derivative, but I’ll save that for the next post.&lt;/p&gt;
+
+&lt;p&gt;As you can see, a smaller variance results in more accurate estimates of $\mu$ and therefore a lower Fisher Information (all things being equal). This is for the case of a single observation. Considering there are 10 observations here, the sample Fisher information is  $n*\dfrac{1}{\sigma ^ {2}} = \dfrac{10}{\sigma ^ {2}}$. This corresponds to 10 and 2.5 for $\sigma$ = 1 and 2 respectively.&lt;/p&gt;
+
+&lt;p&gt;As a final step, I decided to demonstrate the maths in action by estimating the Fisher information over many samples. R makes this too easy!&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;100000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)){&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;small_var&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#generate 10 IID observations from the standard normal distribution&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;large_var&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rnorm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sd&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#double the standard deviation&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info_small&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scores_squared&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;small_var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info_large&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scores_squared&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;large_var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ave_small&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info_small&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ave_large&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mean&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info_large&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CRLB/graph3.png&quot; alt=&quot;Estimated Fisher Information&quot; class=&quot;img-responsive&quot; /&gt;
+ &lt;br /&gt;
+ &lt;/p&gt;
+
+&lt;p&gt;The estimated Fisher Information seems to converge to the calculated value. Isn’t it good when maths does what it’s supposed to!&lt;/p&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Fisher Information is one of those topics that many will cover once in their studies on the way to more applied areas of statistics. The practical use of the CRLB is limited to cases where the sample at hand has a known distribution with an analytic form, which often doesn’t apply.</summary></entry></feed>
